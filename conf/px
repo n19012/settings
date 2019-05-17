@@ -1,0 +1,136 @@
+#!/bin/bash
+
+_DOMAIN='172.16.40.1'
+_PORT=8888
+_IGNORE_PROXY="'*.local'"
+
+
+######  GNOME3 proxy settings
+_MODE_MANUAL="manual"
+_MODE_NONE="none"
+
+unset_gnome_proxy () {
+	gsettings set org.gnome.system.proxy mode $_MODE_NONE
+}
+
+set_gnome_proxy () {
+	
+	gsettings set org.gnome.system.proxy mode $_MODE_MANUAL 
+	gsettings set org.gnome.system.proxy.http host $_DOMAIN
+	gsettings set org.gnome.system.proxy.http port $_PORT
+	gsettings set org.gnome.system.proxy.https host $_DOMAIN
+	gsettings set org.gnome.system.proxy.https port $_PORT
+	gsettings set org.gnome.system.proxy ignore-hosts "['localhost', '127.0.0.0/8', '10.0.0.0/8', '192.168.0.0/16', '172.16.0.0/12',  $_IGNORE_PROXY ]"
+
+}
+
+
+######  Environment proxy settings
+_ENV_FILE_PATH="/etc/environment"
+_ENV_CONF_DATA="http_proxy=http://$_DOMAIN:$_PORT/
+\nhttps_proxy=http://$_DOMAIN:$_PORT/"
+
+unset_env_proxy () {
+    sudo sed -i -e '/^.*_proxy/d' $_ENV_FILE_PATH
+}
+
+set_env_proxy () {
+	unset_env_proxy
+	echo -e $_ENV_CONF_DATA | sudo tee -a $_ENV_FILE_PATH > /dev/null
+}
+
+######  APT proxy settings
+_APT_FILE_PATH="/etc/apt/apt.conf.d/01proxy"
+_APT_CONF_DATA="Acquire::http::proxy http://$_DOMAIN:$_PORT/;
+\nAcquire::https::proxy http://$_DOMAIN:$_PORT/;"
+
+unset_apt_proxy () {
+	if [ -f $_APT_FILE_PATH ]; then
+	  sudo rm $_APT_FILE_PATH
+	fi
+}
+
+set_apt_proxy () {	
+	echo -e $_APT_CONF_DATA | sudo tee  $_APT_FILE_PATH > /dev/null
+}
+
+######  curl proxy settings
+_CURL_FILE_PATH="$HOME/.curlrc"
+_CURL_CONF_DATA="proxy=http://$_DOMAIN:$_PORT/"
+unset_curl_proxy() {
+	if [ -f $_CURL_FILE_PATH ]; then
+		rm $_CURL_FILE_PATH
+	fi
+}
+
+set_curl_proxy() {
+	echo -e $_CURL_CONF_DATA > $_CURL_FILE_PATH
+}
+
+###### Git proxy settings ######
+_GIT_FILE_PATH="$HOME/.gitconfig"
+set_git_proxy () {
+	unset_git_proxy
+	git config --global http.proxy $_DOMAIN:$_PORT
+	git config --global https.proxy $_DOMAIN:$_PORT
+	echo -e "\t** Git proxy  -  OK"
+}
+
+unset_git_proxy () {
+	git config --global --unset http.proxy
+	git config --global --unset https.proxy
+	sed -i -e '/^\[https*\]/d'  $_GIT_FILE_PATH
+	echo -e "\t** Git proxy  -  REMOVED"
+}
+
+###### All proxies ######
+
+set_proxy () {
+	set_gnome_proxy
+	set_env_proxy
+	set_apt_proxy
+	set_curl_proxy
+	set_git_proxy
+	echo -e "\t** System proxy  -  OK"
+}
+
+unset_proxy () {
+	unset_gnome_proxy
+	unset_env_proxy
+	unset_apt_proxy
+	unset_curl_proxy
+	unset_git_proxy
+	echo -e "\t** System proxy  -  REMOVED"
+}
+
+proxy_status () {
+	
+	echo -e "STATUS:\n-----------\n***** System proxy ******\n"
+	env | grep -i "_proxy"
+	echo -e "\n***** Git proxy ******\n[http]"
+	git config --global --get http.proxy
+	echo -e "[https]"
+	git config --global --get https.proxy
+
+}
+
+case $1 in  
+	'status')
+		proxy_status
+	;;
+
+	'off')
+		unset_proxy
+	;;
+
+	'on')
+		set_proxy
+	;;
+
+	*)
+		echo -e "\nUsage :\n---------------\npx on\t:: Setting System proxy\npx off\t:: Unsetting System proxy\n\npx "
+ 		exit 1
+	;;
+esac
+
+exit 0
