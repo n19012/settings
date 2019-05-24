@@ -15,4 +15,3 @@ cp conf/{init.vim,local_bundles.vim,local_init.vim} $_CONFIG_DIR
 
 sudo apt-get install python3-dev python3-pip
 pip3 install -U flake8 flake8-import-order autopep8 black isort
-. ~/.profile
