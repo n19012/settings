@@ -18,7 +18,7 @@ $ sudo apt-get install git
 $ git config --global user.email "メールアドレス"
 $ git config --global user.name  "ローマ字表記の名前"
 $ git config --global color.ui auto
-$ git config --global editor = "subl -w"
+$ git config --global core.editor = "code --wait"
 ```
 
 GitHub & GitHubPage
