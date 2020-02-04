@@ -41,8 +41,8 @@ set_env_proxy () {
 
 ######  APT proxy settings
 _APT_FILE_PATH="/etc/apt/apt.conf.d/01proxy"
-_APT_CONF_DATA="Acquire::http::proxy http://$_DOMAIN:$_PORT/;
-\nAcquire::https::proxy http://$_DOMAIN:$_PORT/;"
+_APT_CONF_DATA="Acquire::http::proxy \"http://$_DOMAIN:$_PORT/\";
+\nAcquire::https::proxy \"http://$_DOMAIN:$_PORT/\";"
 
 unset_apt_proxy () {
 	if [ -f $_APT_FILE_PATH ]; then
