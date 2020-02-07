@@ -5,7 +5,7 @@
 "*****************************************************************************
 let vimplug_exists=expand('~/.config/nvim/autoload/plug.vim')
 
-let g:vim_bootstrap_langs = "python"
+let g:vim_bootstrap_langs = "html,javascript,python"
 let g:vim_bootstrap_editor = "nvim"				" nvim or vim
 
 if !filereadable(vimplug_exists)
@@ -70,6 +70,19 @@ Plug 'tomasr/molokai'
 "*****************************************************************************
 "" Custom bundles
 "*****************************************************************************
+
+" html
+"" HTML Bundle
+Plug 'hail2u/vim-css3-syntax'
+Plug 'gorodinskiy/vim-coloresque'
+Plug 'tpope/vim-haml'
+Plug 'mattn/emmet-vim'
+
+
+" javascript
+"" Javascript Bundle
+Plug 'jelera/vim-javascript-syntax'
+
 
 " python
 "" Python Bundle
@@ -416,6 +429,21 @@ nnoremap <Leader>o :.Gbrowse<CR>
 "" Custom configs
 "*****************************************************************************
 
+" html
+" for html files, 2 spaces
+autocmd Filetype html setlocal ts=2 sw=2 expandtab
+
+
+" javascript
+let g:javascript_enable_domhtmlcss = 1
+
+" vim-javascript
+augroup vimrc-javascript
+  autocmd!
+  autocmd FileType javascript setl tabstop=4|setl shiftwidth=4|setl expandtab softtabstop=4
+augroup END
+
+
 " python
 " vim-python
 augroup vimrc-python
@@ -439,12 +467,6 @@ let g:jedi#smart_auto_mappings = 0
 " ale
 :call extend(g:ale_linters, {
     \'python': ['flake8'], })
-
-let g:ale_fixers = {
-    \ 'python': ['autopep8', 'black', 'isort'],
-    \ }
-
-nmap <silent> <Leader>x <Plug>(ale_fix)
 
 " vim-airline
 let g:airline#extensions#virtualenv#enabled = 1

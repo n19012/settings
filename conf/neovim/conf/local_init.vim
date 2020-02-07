@@ -1,9 +1,22 @@
 set mouse-=a "no mouse
+set clipboard+=unnamedplus
 
 "set tabstop=2
 "set shiftwidth=2
 
-autocmd Filetype js setlocal ts=2 sw=2 expandtab
+""------------------------------------
+" JavaScript
+""------------------------------------
+
+autocmd Filetype javascript setlocal ts=2 sw=2 expandtab
+
+" ale_linters
+
+let g:ale_echo_cursor = 0 
+let g:ale_linters = {'javascript': ['standard']}
+let g:ale_fixers = {'javascript': ['standard']}
+let g:ale_lint_on_save = 1
+let g:ale_fix_on_save = 1
 
 ""------------------------------------
 " Display
